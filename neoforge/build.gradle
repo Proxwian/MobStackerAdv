@@ -7,6 +7,10 @@ base {
     archivesName = "${mod_id}-neoforge-${minecraft_version}"
 }
 
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
 runs {
     configureEach {
         systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -20,7 +24,7 @@ runs {
 
     server {
         workingDirectory project.file('runs/server')
-        programArgument '--nogui'
+        arguments.add '--nogui'
     }
 }
 

@@ -4,6 +4,7 @@
   "package": "com.proxwian.mobstackeradv.fabric.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "EntityPersistentDataMixin",
     "MobTickMixin"
   ],
   "injectors": {

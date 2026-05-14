@@ -18,7 +18,7 @@ final class MobStackerData {
     }
 
     static boolean canStack(Mob mob) {
-        if (mob.hasCustomName() && !mob.getPersistentData().getBoolean(MobStackerTags.MANAGED_NAME)) {
+        if (mob.hasCustomName() && !MobStackerEntityData.get(mob).getBoolean(MobStackerTags.MANAGED_NAME)) {
             return false;
         }
 
@@ -31,22 +31,22 @@ final class MobStackerData {
     }
 
     static int getStackCount(LivingEntity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(entity);
         return Math.max(1, data.getInt(MobStackerTags.STACK_COUNT));
     }
 
     static void setStackCount(LivingEntity entity, int count) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(entity);
         data.putInt(MobStackerTags.STACK_COUNT, Math.max(1, count));
     }
 
     static int getLoveCount(LivingEntity entity) {
-        return Math.max(0, entity.getPersistentData().getInt(MobStackerTags.LOVE_COUNT));
+        return Math.max(0, MobStackerEntityData.get(entity).getInt(MobStackerTags.LOVE_COUNT));
     }
 
     static void setLoveCount(LivingEntity entity, int count) {
         int clamped = Math.max(0, Math.min(count, getStackCount(entity)));
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(entity);
         if (clamped == 0) {
             data.remove(MobStackerTags.LOVE_COUNT);
         } else {
@@ -69,14 +69,14 @@ final class MobStackerData {
     }
 
     static void addBreedingCooldowns(LivingEntity entity, int count) {
-        int[] current = entity.getPersistentData().getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
+        int[] current = MobStackerEntityData.get(entity).getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
         int[] updated = new int[current.length + count];
         System.arraycopy(current, 0, updated, 0, current.length);
         int cooldownUntil = (int) Math.min(Integer.MAX_VALUE, entity.level().getGameTime() + BREEDING_COOLDOWN_TICKS);
         for (int index = current.length; index < updated.length; index++) {
             updated[index] = cooldownUntil;
         }
-        entity.getPersistentData().put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(updated));
+        MobStackerEntityData.get(entity).put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(updated));
         clampStackState(entity);
     }
 
@@ -98,25 +98,25 @@ final class MobStackerData {
         pruneAndCountCooldowns(source, source.level().getGameTime());
         pruneAndCountCooldowns(target, target.level().getGameTime());
 
-        int[] sourceCooldowns = source.getPersistentData().getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
+        int[] sourceCooldowns = MobStackerEntityData.get(source).getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
         if (count <= 0 || sourceCooldowns.length == 0) {
             return;
         }
 
         int transfer = Math.min(count, sourceCooldowns.length);
-        int[] targetCooldowns = target.getPersistentData().getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
+        int[] targetCooldowns = MobStackerEntityData.get(target).getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
         int[] updatedTarget = new int[targetCooldowns.length + transfer];
         System.arraycopy(targetCooldowns, 0, updatedTarget, 0, targetCooldowns.length);
         System.arraycopy(sourceCooldowns, 0, updatedTarget, targetCooldowns.length, transfer);
-        target.getPersistentData().put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(updatedTarget));
+        MobStackerEntityData.get(target).put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(updatedTarget));
 
         int remaining = sourceCooldowns.length - transfer;
         if (remaining <= 0) {
-            source.getPersistentData().remove(MobStackerTags.BREEDING_COOLDOWNS);
+            MobStackerEntityData.get(source).remove(MobStackerTags.BREEDING_COOLDOWNS);
         } else {
             int[] updatedSource = new int[remaining];
             System.arraycopy(sourceCooldowns, transfer, updatedSource, 0, remaining);
-            source.getPersistentData().put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(updatedSource));
+            MobStackerEntityData.get(source).put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(updatedSource));
         }
     }
 
@@ -125,18 +125,18 @@ final class MobStackerData {
         setLoveCount(entity, getLoveCount(entity));
         int maxCount = getStackCount(entity);
         int maxCooldowns = Math.max(0, maxCount - getLoveCount(entity));
-        int[] cooldowns = entity.getPersistentData().getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
+        int[] cooldowns = MobStackerEntityData.get(entity).getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
         if (cooldowns.length <= maxCooldowns) {
             return;
         }
 
         int[] trimmed = new int[maxCooldowns];
         System.arraycopy(cooldowns, 0, trimmed, 0, maxCooldowns);
-        entity.getPersistentData().put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(trimmed));
+        MobStackerEntityData.get(entity).put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(trimmed));
     }
 
     static void clearStackData(LivingEntity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(entity);
         data.remove(MobStackerTags.STACK_COUNT);
         data.remove(MobStackerTags.MANAGED_NAME);
         data.remove(MobStackerTags.LOVE_COUNT);
@@ -144,14 +144,14 @@ final class MobStackerData {
     }
 
     static void clearBreedingState(LivingEntity entity) {
-        CompoundTag data = entity.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(entity);
         data.remove(MobStackerTags.LOVE_COUNT);
         data.remove(MobStackerTags.BREEDING_COOLDOWNS);
     }
 
     static void refreshName(Mob mob) {
         int count = getStackCount(mob);
-        CompoundTag data = mob.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(mob);
 
         if (count <= 1 || !MobStackerConfig.SHOW_STACK_NAME.get()) {
             if (data.getBoolean(MobStackerTags.MANAGED_NAME)) {
@@ -169,7 +169,7 @@ final class MobStackerData {
     }
 
     static boolean isNoStackLocked(Mob mob) {
-        CompoundTag data = mob.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(mob);
         long noStackUntil = data.getLong(MobStackerTags.NO_STACK_UNTIL);
         if (noStackUntil <= 0) {
             return false;
@@ -184,7 +184,7 @@ final class MobStackerData {
     }
 
     private static int pruneAndCountCooldowns(LivingEntity entity, long gameTime) {
-        int[] cooldowns = entity.getPersistentData().getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
+        int[] cooldowns = MobStackerEntityData.get(entity).getIntArray(MobStackerTags.BREEDING_COOLDOWNS);
         if (cooldowns.length == 0) {
             return 0;
         }
@@ -200,7 +200,7 @@ final class MobStackerData {
 
         int[] trimmed = new int[activeCount];
         System.arraycopy(active, 0, trimmed, 0, activeCount);
-        entity.getPersistentData().put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(trimmed));
+        MobStackerEntityData.get(entity).put(MobStackerTags.BREEDING_COOLDOWNS, new IntArrayTag(trimmed));
         return activeCount;
     }
 

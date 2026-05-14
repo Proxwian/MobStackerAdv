@@ -17,7 +17,7 @@ final class StackedEggLaying {
             return;
         }
 
-        CompoundTag data = chicken.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(chicken);
         int previousEggTime = data.getInt(MobStackerTags.PREVIOUS_EGG_TIME);
         int currentEggTime = chicken.eggTime;
         int extraEggs = MobStackerData.getStackCount(chicken) - 1;

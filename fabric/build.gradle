@@ -6,6 +6,10 @@ base {
     archivesName = "${mod_id}-fabric-${minecraft_version}"
 }
 
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
 loom {
     mixin.defaultRefmapName = "${mod_id}.refmap.json"
 }

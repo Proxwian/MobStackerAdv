@@ -14,5 +14,13 @@ pluginManagement {
 
 rootProject.name = 'mobstackeradv'
 
+if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+    throw new GradleException(
+            'NeoForge/Fabric 1.21.1 builds require Gradle to run on Java 21. ' +
+            'Install JDK 21 and set JAVA_HOME to it before running :neoforge:build or :fabric:build. ' +
+            'For Forge 1.20.1 on Java 17, switch to the forge-1.20.1 branch.'
+    )
+}
+
 include 'neoforge'
 include 'fabric'

@@ -1,12 +1,14 @@
 package com.proxwian.mobstackeradv;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Cow;
@@ -53,10 +55,9 @@ public final class MobInteractionEvents {
 
         int feedable = MobStackerData.getFeedableCount(animal);
         if (feedable <= 0) {
-            return;
+            return InteractionResult.PASS;
         }
 
-        Player player = event.getEntity();
         int foodUsed = player.getAbilities().instabuild ? feedable : Math.min(feedable, held.getCount());
         if (foodUsed <= 0) {
             return InteractionResult.PASS;
@@ -72,7 +73,7 @@ public final class MobInteractionEvents {
     }
 
     private static boolean handleNameTagSplit(Player player, Mob mob, ItemStack held) {
-        if (!held.is(Items.NAME_TAG) || !held.hasCustomHoverName() || MobStackerData.getStackCount(mob) <= 1) {
+        if (!held.is(Items.NAME_TAG) || !held.has(DataComponents.CUSTOM_NAME) || MobStackerData.getStackCount(mob) <= 1) {
             return false;
         }
 
@@ -83,7 +84,7 @@ public final class MobInteractionEvents {
 
         namedMob.setCustomName(held.getHoverName());
         namedMob.setCustomNameVisible(true);
-        namedMob.getPersistentData().remove(MobStackerTags.MANAGED_NAME);
+        MobStackerEntityData.get(namedMob).remove(MobStackerTags.MANAGED_NAME);
 
         if (!player.getAbilities().instabuild) {
             held.shrink(1);
@@ -129,9 +130,9 @@ public final class MobInteractionEvents {
         MobStackerData.setStackCount(split, 1);
         MobStackerData.clearStackData(split);
         if (noStackTicks > 0) {
-            split.getPersistentData().putLong(MobStackerTags.NO_STACK_UNTIL, level.getGameTime() + noStackTicks);
+            MobStackerEntityData.get(split).putLong(MobStackerTags.NO_STACK_UNTIL, level.getGameTime() + noStackTicks);
         } else {
-            split.getPersistentData().remove(MobStackerTags.NO_STACK_UNTIL);
+            MobStackerEntityData.get(split).remove(MobStackerTags.NO_STACK_UNTIL);
         }
         split.setCustomName(null);
         split.setCustomNameVisible(false);
@@ -158,7 +159,7 @@ public final class MobInteractionEvents {
         }
 
         if (!player.getAbilities().instabuild) {
-            held.hurtAndBreak(shearCount, player, brokenPlayer -> brokenPlayer.broadcastBreakEvent(hand));
+            held.hurtAndBreak(shearCount, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
         }
 
         return true;

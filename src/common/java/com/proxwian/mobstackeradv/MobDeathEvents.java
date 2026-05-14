@@ -20,8 +20,8 @@ public final class MobDeathEvents {
             return true;
         }
 
-        if (mob.getPersistentData().getBoolean(MobStackerTags.SACRIFICIAL_DEATH)) {
-            mob.getPersistentData().remove(MobStackerTags.SACRIFICIAL_DEATH);
+        if (MobStackerEntityData.get(mob).getBoolean(MobStackerTags.SACRIFICIAL_DEATH)) {
+            MobStackerEntityData.get(mob).remove(MobStackerTags.SACRIFICIAL_DEATH);
             return true;
         }
 
@@ -42,7 +42,7 @@ public final class MobDeathEvents {
 
         spawnRemainingStackAfterDeath(mob, count - 1);
         if (isEnvironmentalFireDamage(source)) {
-            mob.getPersistentData().putBoolean(MobStackerTags.PROTECT_FIRE_DROPS, true);
+            MobStackerEntityData.get(mob).putBoolean(MobStackerTags.PROTECT_FIRE_DROPS, true);
         }
         MobStackerData.clearStackData(mob);
         mob.setCustomName(null);
@@ -60,7 +60,7 @@ public final class MobDeathEvents {
     }
 
     public boolean shouldProtectDrops(Mob mob) {
-        return !mob.level().isClientSide() && mob.getPersistentData().getBoolean(MobStackerTags.PROTECT_FIRE_DROPS);
+        return !mob.level().isClientSide() && MobStackerEntityData.get(mob).getBoolean(MobStackerTags.PROTECT_FIRE_DROPS);
     }
 
     public void onServerTickEnd() {
@@ -134,7 +134,7 @@ public final class MobDeathEvents {
             MobStackerData.clearStackData(sacrifice);
             sacrifice.setCustomName(null);
             sacrifice.setCustomNameVisible(false);
-            sacrifice.getPersistentData().putBoolean(MobStackerTags.SACRIFICIAL_DEATH, true);
+            MobStackerEntityData.get(sacrifice).putBoolean(MobStackerTags.SACRIFICIAL_DEATH, true);
             level.addFreshEntityWithPassengers(sacrifice);
             sacrifice.hurt(source, Math.max(amount, sacrifice.getMaxHealth()));
         }
@@ -159,13 +159,13 @@ public final class MobDeathEvents {
             return;
         }
 
-        mob.getPersistentData().putLong(MobStackerTags.ENVIRONMENT_PROTECTION_UNTIL, mob.level().getGameTime() + ticks);
+        MobStackerEntityData.get(mob).putLong(MobStackerTags.ENVIRONMENT_PROTECTION_UNTIL, mob.level().getGameTime() + ticks);
         mob.clearFire();
         mob.invulnerableTime = Math.max(mob.invulnerableTime, ticks);
     }
 
     private static boolean hasPostDeathProtection(Mob mob) {
-        CompoundTag data = mob.getPersistentData();
+        CompoundTag data = MobStackerEntityData.get(mob);
         long protectedUntil = data.getLong(MobStackerTags.ENVIRONMENT_PROTECTION_UNTIL);
         if (protectedUntil <= 0) {
             return false;

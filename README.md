@@ -27,6 +27,22 @@ Useful options:
 
 Build jars:
 
+Minecraft 1.21.1 builds require JDK 21. Check your Gradle JVM with:
+
+```text
+java -version
+```
+
+The Gradle wrapper uses Gradle 8.14 for the NeoForge Gradle plugin.
+
+On Windows PowerShell, after installing JDK 21, point `JAVA_HOME` at it before building:
+
+```text
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+./gradlew :neoforge:build
+```
+
 ```text
 ./gradlew :neoforge:build
 ./gradlew :fabric:build

@@ -12,9 +12,10 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingHurtEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -58,9 +59,17 @@ public final class MobStackerAdvNeoForge {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onLivingHurt(LivingHurtEvent event) {
+    public void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (event.getEntity() instanceof Mob mob && !deathEvents.allowDamage(mob, event.getSource(), event.getAmount())) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onLivingDamagePre(LivingDamageEvent.Pre event) {
+        if (event.getEntity() instanceof Mob mob && event.getNewDamage() >= mob.getHealth()
+                && !deathEvents.allowDeath(mob, event.getSource(), event.getNewDamage())) {
+            event.setNewDamage(0.0F);
         }
     }
 

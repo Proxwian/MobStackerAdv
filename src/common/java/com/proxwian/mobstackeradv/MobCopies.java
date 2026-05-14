@@ -55,7 +55,7 @@ final class MobCopies {
             copy.setCustomNameVisible(false);
             copy.invulnerableTime = Math.max(copy.invulnerableTime, invulnerableTicks);
             if (invulnerableTicks > 0) {
-                copy.getPersistentData().putLong(MobStackerTags.ENVIRONMENT_PROTECTION_UNTIL, level.getGameTime() + invulnerableTicks);
+                MobStackerEntityData.get(copy).putLong(MobStackerTags.ENVIRONMENT_PROTECTION_UNTIL, level.getGameTime() + invulnerableTicks);
             }
             level.addFreshEntityWithPassengers(copy);
         }
