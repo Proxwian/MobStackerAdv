@@ -30,7 +30,10 @@ Build jars:
 ```text
 ./gradlew :neoforge:build
 ./gradlew :fabric:build
+./gradlew :forge:build
 ```
+
+On Java 17, the `forge-1.20.1` branch skips the Java-21-only NeoForge/Fabric modules during Gradle configuration so Forge 1.20.1 can still build normally.
 
 Rules:
 

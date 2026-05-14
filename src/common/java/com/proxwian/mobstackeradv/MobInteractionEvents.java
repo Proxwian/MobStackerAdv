@@ -53,10 +53,9 @@ public final class MobInteractionEvents {
 
         int feedable = MobStackerData.getFeedableCount(animal);
         if (feedable <= 0) {
-            return;
+            return InteractionResult.PASS;
         }
 
-        Player player = event.getEntity();
         int foodUsed = player.getAbilities().instabuild ? feedable : Math.min(feedable, held.getCount());
         if (foodUsed <= 0) {
             return InteractionResult.PASS;

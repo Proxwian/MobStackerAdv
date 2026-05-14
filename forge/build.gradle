@@ -1,0 +1,77 @@
+plugins {
+    id 'java-library'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+base {
+    archivesName = "${mod_id}-forge-${forge_minecraft_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+minecraft {
+    mappings channel: 'official', version: forge_minecraft_version
+
+    runs {
+        client {
+            workingDirectory project.file('runs/client')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                mobstackeradv {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('runs/server')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            args '--nogui'
+            mods {
+                mobstackeradv {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+sourceSets.main {
+    java {
+        srcDir '../src/common/java'
+        srcDir '../src/forge/java'
+    }
+    resources {
+        srcDir '../src/forge/resources'
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${forge_minecraft_version}-${forge_version}"
+}
+
+processResources {
+    inputs.properties([
+            minecraft_version: forge_minecraft_version,
+            forge_version    : forge_version,
+            mod_id           : mod_id,
+            mod_name         : mod_name,
+            mod_license      : mod_license,
+            mod_version      : mod_version,
+            mod_authors      : mod_authors,
+            mod_description  : mod_description
+    ])
+
+    filesMatching('META-INF/mods.toml') {
+        expand inputs.properties
+    }
+}
