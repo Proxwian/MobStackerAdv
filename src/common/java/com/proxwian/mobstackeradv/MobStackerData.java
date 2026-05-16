@@ -141,6 +141,7 @@ final class MobStackerData {
         data.remove(MobStackerTags.MANAGED_NAME);
         data.remove(MobStackerTags.LOVE_COUNT);
         data.remove(MobStackerTags.BREEDING_COOLDOWNS);
+        data.remove(MobStackerTags.PIG_LIGHTNING_CONVERSION_UNTIL);
     }
 
     static void clearBreedingState(LivingEntity entity) {
