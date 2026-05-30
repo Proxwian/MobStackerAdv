@@ -1,17 +1,23 @@
 package com.proxwian.mobstackeradv.neoforge;
 
 import com.proxwian.mobstackeradv.MobBreedingEvents;
+import com.proxwian.mobstackeradv.MobConversionEvents;
 import com.proxwian.mobstackeradv.MobDeathEvents;
 import com.proxwian.mobstackeradv.MobInteractionEvents;
 import com.proxwian.mobstackeradv.MobStackerAdv;
 import com.proxwian.mobstackeradv.MobStackingEvents;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
@@ -42,6 +48,23 @@ public final class MobStackerAdvNeoForge {
     public void onBabySpawn(BabyEntitySpawnEvent event) {
         if (event.getChild() != null) {
             MobBreedingEvents.onBabySpawn(event.getChild());
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void onLivingConversionPre(LivingConversionEvent.Pre event) {
+        if (event.getEntity() instanceof Pig pig && event.getOutcome() == EntityType.ZOMBIFIED_PIGLIN
+                && pig.level() instanceof ServerLevel level
+                && MobConversionEvents.handlePigLightningConversion(pig, level)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingConversionPost(LivingConversionEvent.Post event) {
+        if (event.getEntity() instanceof Pig pig && event.getOutcome() instanceof ZombifiedPiglin
+                && pig.level() instanceof ServerLevel level) {
+            MobConversionEvents.afterPigLightningConversion(pig, event.getOutcome(), level);
         }
     }
 

@@ -8,6 +8,7 @@ final class MobStackerTags {
     static final String PREVIOUS_EGG_TIME = MobStackerAdv.MOD_ID + ":previous_egg_time";
     static final String NO_STACK_UNTIL = MobStackerAdv.MOD_ID + ":no_stack_until";
     static final String ENVIRONMENT_PROTECTION_UNTIL = MobStackerAdv.MOD_ID + ":environment_protection_until";
+    static final String PIG_LIGHTNING_CONVERSION_UNTIL = MobStackerAdv.MOD_ID + ":pig_lightning_conversion_until";
     static final String PROTECT_FIRE_DROPS = MobStackerAdv.MOD_ID + ":protect_fire_drops";
     static final String SACRIFICIAL_DEATH = MobStackerAdv.MOD_ID + ":sacrificial_death";
 
